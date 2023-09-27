@@ -1,0 +1,35 @@
+name: Deploy bot
+run-name: ${{ github.actor }} is deploying bot
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'The branch to build'
+        required: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+      - shell: bash
+        env:
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
+          DEPLOY_IP: ${{ secrets.DEPLOY_IP }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: |
+
+          sshpass -p "$DEPLOY_PASSWORD" rsync -e 'ssh -o StrictHostKeyChecking=no' -az source "$DEPLOY_USER@$DEPLOY_IP:/textgericht/" 
+          sshpass -p "$DEPLOY_PASSWORD" ssh -o StrictHostKeyChecking=no "$DEPLOY_USER@$DEPLOY_IP" bash <<EOF
+          
+          pkill -9 python
+          export BOT_TOKEN=${BOT_TOKEN}
+          cd /textgericht/source/
+          pip install -r requirements.txt
+          eval "nohup python main.py" &>/dev/null & disown;
+          exit
+
+          EOF
+

@@ -1,7 +1,15 @@
 import logging
+import traceback
 import os
-from telegram import ForceReply, Update
+from telegram import ForceReply, Update, constants
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+import sys
+sys.path.append("./Controllers")
+from DBController import DBController
+from GPTController import GPTController
+
+gptController = GPTController(os.getenv('GPT_TOKEN'))
+dbController = DBController(os.getenv('DB_PATH'))
 
 # Enable logging
 logging.basicConfig(
@@ -12,41 +20,61 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
+def get_info():
+    return """This bot can check if given text manipulative or not.
+To do this simply send your text to the bot and it will reply on the language of the given text to you.
+If you want to get answer in any other language please call /set_lang {Full name of language: English}.
+If you want to check the source by URL please use /link_info {URL}.
+    """
 
-# Define a few command handlers. These usually take the two arguments update and
-# context.
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Send a message when the command /start is issued."""
     user = update.effective_user
     await update.message.reply_html(
-        rf"Hi {user.mention_html()}!",
-        reply_markup=ForceReply(selective=True),
+        rf"Hello {user.mention_html()}! Here is the info how to use this bot:" + get_info(),
+    )
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text(get_info())
+
+async def text_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # Use this link to make bot typing
+    await context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=constants.ChatAction.TYPING)
+
+    result = gptController.check_text(update.message.text, context.user_data["lang"] if "lang" in context.user_data.keys() else "As text")
+    # Store data about request
+    await dbController.process_text_check(update.message.text, result)
+    await update.message.reply_text(result)
+
+async def link_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if len(context.args) == 0:
+        await update.message.reply_text("No URL were provided. Aborting")
+        return
+    await update.message.reply_text(dbController.get_link_info(context.args[0]))
+
+async def set_lang(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if len(context.args) == 0:
+        await update.message.reply_text("No language were provided. Aborting")
+        return
+    context.user_data["lang"] = context.args[0]
+    await update.message.reply_text("All responses to you would be in {} language".format(context.args[0]))
+
+async def error(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await context.bot.send_message(
+        chat_id=os.getenv("DEVELOPER_CHAT_ID"), text="This error has occured: " + ''.join(traceback.format_exception(etype=type(context.error), value=context.error, tb=context.error.__traceback__))
     )
 
 
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Send a message when the command /help is issued."""
-    await update.message.reply_text("Help!")
-
-
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Echo the user message."""
-    await update.message.reply_text(update.message.text)
-
-
 def main() -> None:
-    """Start the bot."""
-    # Create the Application and pass it your bot's token.
+    
     application = Application.builder().token(os.getenv('BOT_TOKEN')).build()
 
-    # on different commands - answer in Telegram
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("link_info", link_info))
+    application.add_handler(CommandHandler("set_lang", set_lang))
+    application.add_error_handler(error)
 
-    # on non command i.e message - echo the message on Telegram
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_check))
 
-    # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 

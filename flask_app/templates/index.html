@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texts</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Texts</h1>
+
+        <form method="post" action="{{ url_for('filter_texts') }}" class="mb-4">
+            <div class="form-row">
+                <div class="col-md-4 mb-3">
+                    <label for="source">Filter by Source:</label>
+                    <input type="text" class="form-control" name="source" id="source">
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="manipulation_method">Filter by Manipulation Method:</label>
+                    <input type="text" class="form-control" name="manipulation_method" id="manipulation_method">
+                </div>
+
+                <div class="col-md-2 mb-3">
+                    <label>&nbsp;</label>
+                    <button type="submit" class="btn btn-primary btn-block">Filter</button>
+                </div>
+            </div>
+        </form>
+
+        {% if source or manipulation_method %}
+            <div class="alert alert-info" role="alert">
+                {% if source %}
+                    Source Filter: <strong>{{ source }}</strong>
+                {% endif %}
+
+                {% if source and manipulation_method %}
+                    &nbsp;&nbsp;&nbsp;
+                {% endif %}
+
+                {% if manipulation_method %}
+                    Manipulation Method Filter: <strong>{{ manipulation_method }}</strong>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Text</th>
+                    <th>Source</th>
+                    <th>Text Type</th>
+                    <th>Date</th>
+                    <th>Manipulation Methods</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for text in texts %}
+                    <tr>
+                        <td>{{ text[0] }}</td>
+                        <td>{{ text[1] }}</td>
+                        <td>{{ text[2] }}</td>
+                        <td>{{ text[3] }}</td>
+                        <td>{{ text[4] }}</td>
+                        <td>{{ text[11] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap JS and dependencies (optional, but needed for some features) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>

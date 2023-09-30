@@ -21,12 +21,12 @@ def process_text(text):
     if text_type.lower() != "личное сообщение":
         run_analysis = True
     if run_analysis:
-        return analyse_text(text)
+        return analyse_text(text, text_type)
     else:
-        return {}
+        return {'text_type': text_type}
 
 
-def analyse_text(text):
+def analyse_text(text, text_type):
     field2prompt = {
         "manipulation_methods": PROMPTS['manipulation_prompt'],
         "hatespeech": PROMPTS['hatespeech_prompt'],
@@ -35,8 +35,6 @@ def analyse_text(text):
     }
     criteria = {field: None for field in field2prompt.keys()}
     for field_name, prompt in field2prompt.items():
-        if 'manipulation' in field_name:
-            print(f"{prompt} '{text}'")
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -54,7 +52,8 @@ def analyse_text(text):
     else:
         criteria["manipulation_present"] = 1
     if "Логические ошибки: не обнаружены" in criteria["logical_fallacies"]:
-        criteria["manipulation_present"] = 0
+        criteria["logical_fallacies_present"] = 0
     else:
-        criteria["manipulation_present"] = 1
+        criteria["logical_fallacies_present"] = 1
+    criteria['text_type'] = text_type
     return criteria

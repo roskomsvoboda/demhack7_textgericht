@@ -61,9 +61,9 @@ def analyse_text(text):
     else:
         criteria["manipulation_present"] = 1
     if "Логические ошибки: не обнаружены" in criteria["logical_fallacies"]:
-        criteria["manipulation_present"] = 0
+        criteria["logical_fallacies_present"] = 0
     else:
-        criteria["manipulation_present"] = 1
+        criteria["logical_fallacies_present"] = 1
     return criteria
 
 

@@ -15,6 +15,9 @@ jobs:
           DEPLOY_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
           DEPLOY_IP: ${{ secrets.DEPLOY_IP }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          DEVELOPER_CHAT_ID: ${{ secrets.DEVELOPER_CHAT_ID }}
+          GPT_TOKEN: ${{ secrets.GPT_TOKEN }}
+          DB_PATH: ${{ secrets.DB_PATH }}
         run: |
 
           sshpass -p "$DEPLOY_PASSWORD" rsync -e 'ssh -o StrictHostKeyChecking=no' -az source "$DEPLOY_USER@$DEPLOY_IP:/textgericht/" 
@@ -22,6 +25,9 @@ jobs:
           
           pkill -9 python
           export BOT_TOKEN=${BOT_TOKEN}
+          export DEVELOPER_CHAT_ID=${DEVELOPER_CHAT_ID}
+          export GPT_TOKEN=${GPT_TOKEN}
+          export DB_PATH=${DB_PATH}
           cd /textgericht/source/
           pip install -r requirements.txt
           eval "nohup python main.py" &>/dev/null & disown;

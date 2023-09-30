@@ -1,4 +1,5 @@
 import argparse
+import logging
 import os
 import pickle
 
@@ -8,6 +9,8 @@ import yaml
 from tchan import ChannelScraper
 
 utc = pytz.UTC
+
+logging.basicConfig(level=logging.INFO)
 
 def parse_paper(link: str, db: dict):
     """
@@ -52,35 +55,36 @@ def scrape_info(source: str, no_of_msgs=10, path_to_db="data/db/demhack_db.p", p
         db = list()
     scraper = ChannelScraper()
     errors = list()
-    try:
-        for idx, msg in enumerate(scraper.messages(source)):
+    for idx, msg in enumerate(scraper.messages(source)):
+        try:
             if (idx < no_of_msgs):
                 msg_url = f'https://t.me/{msg.channel}/{msg.id}'
                 if not msg_url in [existed_msgs['message_url'] for existed_msgs in db]: # check if a msg is already in db
                     target_info = {'created_at': msg.created_at,
-                                   'message_url': f'https://t.me/{msg.channel}/{msg.id}',
-                                   'type': msg.type,
-                                   'channel': msg.channel,
-                                   'edited': msg.edited,
-                                   'url': dict(msg.urls)['link'] if 'link' in dict(msg.urls).keys() else float('nan'),
-                                   'author': msg.author,
-                                   'tg_preview_text': msg.text,
-                                   'source_url': float('nan'),
-                                   'text': float('nan'),
-                                   'meta_keywords': float('nan'),
-                                   'authors': float('nan'),
-                                   'twitter': float('nan'),
-                                   'site_name': float('nan')}
+                                    'message_url': f'https://t.me/{msg.channel}/{msg.id}',
+                                    'type': msg.type,
+                                    'channel': msg.channel,
+                                    'edited': msg.edited,
+                                    'url': dict(msg.urls)['link'] if 'link' in dict(msg.urls).keys() else float('nan'),
+                                    'author': msg.author,
+                                    'tg_preview_text': msg.text,
+                                    'source_url': float('nan'),
+                                    'text': float('nan'),
+                                    'meta_keywords': float('nan'),
+                                    'authors': float('nan'),
+                                    'twitter': float('nan'),
+                                    'site_name': float('nan')}
                     if isinstance(target_info['url'], str): # if the full-text-link available
                         target_info = parse_paper(target_info['url'], target_info) # extract info from the article
                     db.append(target_info)
             else:
+                logging.info(f'{source} had been processed successfully')
                 pickle.dump(db, open(path_to_db, "wb")) # write everything to the db
+                pickle.dump(errors, open(path_to_errors, "wb"))
                 return
-    except:
-        errors.append((source))
-        if len(errors) >= no_of_msgs:
-            pickle.dump(errors, open(path_to_errors, "wb"))
+        except:
+            errors.append((source))
+            continue
 
 
 if __name__ == '__main__':
@@ -99,5 +103,6 @@ if __name__ == '__main__':
         sources = yaml.safe_load(config_file)['sources']
 
     for source in sources:
+        logging.info(f'Start processing: {source}')
         scrape_info(source=source, no_of_msgs=args.no_of_msgs, path_to_db=args.path_to_db,
                     path_to_errors=args.path_to_errors)

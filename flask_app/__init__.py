@@ -1,7 +1,4 @@
 import os
-import argparse
-
-
 import openai
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -19,7 +16,7 @@ def process_text(text):
     run_analysis = False
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": f"{PROMPTS['type_prompt']} '{text}'"}],
+        messages=[{"role": "user", "content": f"{PROMPTS['type_prompt']} Текст: '{text}'"}],
         temperature=0,
         top_p=1,
         frequency_penalty=0,
@@ -46,9 +43,13 @@ def analyse_text(text):
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "Assistant is a large language model trained by OpenAI"},
+                {"role": "system", "content": SYSTEM_CONTENT},
                 {"role": "user", "content": f"{prompt} '{text}'"},
             ],
+            temperature=0,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0,
         )
         answer = response["choices"][0]["message"]["content"]
         criteria[field_name] = answer
@@ -65,17 +66,3 @@ def analyse_text(text):
     else:
         criteria["manipulation_present"] = 1
     return criteria
-
-
-def main(text):
-    process_text(text)
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Run ChatGPT prompts for the given text."
-    )
-    parser.add_argument("--text", type=str, help="Input text to be processed.")
-
-    args = parser.parse_args()
-    main(args.text)

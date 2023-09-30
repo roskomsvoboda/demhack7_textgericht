@@ -56,7 +56,7 @@ def scrape_info(source: str, no_of_msgs=10, path_to_db="data/db/demhack_db.p", p
         for idx, msg in enumerate(scraper.messages(source)):
             if (idx < no_of_msgs):
                 msg_url = f'https://t.me/{msg.channel}/{msg.id}'
-                if not msg_url in [existed_msgs['type'] for existed_msgs in db]: # check if a msg is already in db
+                if not msg_url in [existed_msgs['message_url'] for existed_msgs in db]: # check if a msg is already in db
                     target_info = {'created_at': msg.created_at,
                                    'message_url': f'https://t.me/{msg.channel}/{msg.id}',
                                    'type': msg.type,

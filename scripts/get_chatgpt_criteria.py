@@ -79,7 +79,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Run ChatGPT prompts for the given text."
     )
-    parser.add_argument("text", type=str, help="Input text to be processed.")
+    parser.add_argument("--text", type=str, help="Input text to be processed.")
 
     args = parser.parse_args()
     main(args.text)

@@ -3,20 +3,20 @@ import openai
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-PROMPTS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), './prompts/')
+PROMPTS_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "./prompts/")
 PROMPTS = {}
 for f in os.listdir(PROMPTS_DIR):
-    if f.endswith('_prompt.txt'):
-        with open(os.path.join(PROMPTS_DIR, f), 'r', encoding='utf-8') as f_in:
-            PROMPTS[f.replace('.txt', '')] = '\n'.join(f_in.readlines())
-            
+    if f.endswith("_prompt.txt"):
+        with open(os.path.join(PROMPTS_DIR, f), "r", encoding="utf-8") as f_in:
+            PROMPTS[f.replace(".txt", "")] = "\n".join(f_in.readlines())
+
 
 def process_text(text):
     run_analysis = False
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": f"{PROMPTS['type_prompt']} '{text}'"}],
-        temperature=0
+        temperature=0,
     )
     text_type = response["choices"][0]["message"]["content"]
     if text_type.lower() != "личное сообщение":
@@ -24,15 +24,15 @@ def process_text(text):
     if run_analysis:
         return analyse_text(text, text_type)
     else:
-        return {'text_type': text_type}
+        return {"text_type": text_type}
 
 
 def analyse_text(text, text_type):
     field2prompt = {
-        "manipulation_methods": PROMPTS['manipulation_prompt'],
-        "hatespeech": PROMPTS['hatespeech_prompt'],
-        "references": PROMPTS['references_prompt'],
-        "logical_fallacies": PROMPTS['logical_fallacy_prompt'],
+        "manipulation_methods": PROMPTS["manipulation_prompt"],
+        "hatespeech": PROMPTS["hatespeech_prompt"],
+        "references": PROMPTS["references_prompt"],
+        "logical_fallacies": PROMPTS["logical_fallacy_prompt"],
     }
     criteria = {field: None for field in field2prompt.keys()}
     for field_name, prompt in field2prompt.items():
@@ -41,7 +41,7 @@ def analyse_text(text, text_type):
             messages=[
                 {"role": "user", "content": f"{prompt} '{text}'"},
             ],
-            temperature=0
+            temperature=0,
         )
         answer = response["choices"][0]["message"]["content"]
         criteria[field_name] = answer
@@ -57,5 +57,5 @@ def analyse_text(text, text_type):
         criteria["logical_fallacies_present"] = 0
     else:
         criteria["logical_fallacies_present"] = 1
-    criteria['text_type'] = text_type
+    criteria["text_type"] = text_type
     return criteria

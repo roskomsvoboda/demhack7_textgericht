@@ -6,14 +6,15 @@ import openai
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-PROMPTS_DIR = './prompts/'
+PROMPTS_DIR = "./prompts/"
 PROMPTS = {}
 for f in os.listdir(PROMPTS_DIR):
-    if f.endswith('_prompt.txt'):
-        with open(os.path.join(PROMPTS_DIR, f), 'r', encoding='utf-8') as f_in:
-            PROMPTS[f.replace('.txt', '')] = '\n'.join(f_in.readlines())
+    if f.endswith("_prompt.txt"):
+        with open(os.path.join(PROMPTS_DIR, f), "r", encoding="utf-8") as f_in:
+            PROMPTS[f.replace(".txt", "")] = "\n".join(f_in.readlines())
 
 SYSTEM_CONTENT = "Ты - журналист и исследователь российских СМИ, работающий в условиях диктатуры и военной цензуры (война между Россией и Украиной, с вмешательством Европы и США)."
+
 
 def process_text(text):
     run_analysis = False
@@ -36,17 +37,20 @@ def process_text(text):
 
 def analyse_text(text):
     field2prompt = {
-        "manipulation_methods": PROMPTS['manipulation_prompt'],
-        "hatespeech": PROMPTS['hatespeech_prompt'],
-        "references": PROMPTS['references_prompt'],
-        "logical_fallacies": PROMPTS['logical_fallacy_prompt'],
+        "manipulation_methods": PROMPTS["manipulation_prompt"],
+        "hatespeech": PROMPTS["hatespeech_prompt"],
+        "references": PROMPTS["references_prompt"],
+        "logical_fallacies": PROMPTS["logical_fallacy_prompt"],
     }
     criteria = {field: None for field in field2prompt.keys()}
     for field_name, prompt in field2prompt.items():
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "Assistant is a large language model trained by OpenAI"},
+                {
+                    "role": "system",
+                    "content": "Assistant is a large language model trained by OpenAI",
+                },
                 {"role": "user", "content": f"{prompt} '{text}'"},
             ],
         )

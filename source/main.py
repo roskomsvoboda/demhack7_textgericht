@@ -40,6 +40,9 @@ async def text_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     await context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=constants.ChatAction.TYPING)
 
     result = gptController.process_text(text=update.message.text)
+    if isinstance(result, str):
+        await update.message.reply_text(result)
+        return
     # Store data about request
     await dbController.process_text_check(update.message.text, result)
     await update.message.reply_text(result)

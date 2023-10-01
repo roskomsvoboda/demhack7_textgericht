@@ -30,7 +30,7 @@ def analyze_text(text: str, prompts: dict, parse_patterns: list, reply_lang):
             answer = response["choices"][0]["message"]["content"].split('\n\n')
             for idx, ans_el in enumerate(answer):
                 if sum(bool(pattern.match(ans_el)) for pattern in parse_patterns):
-                    answer[idx] = re.sub(r'\..*', '.', ans_el)
+                    #answer[idx] = re.sub(r'\..*', '.', ans_el)
                     criteria[f"{field_name}_present"] = 1
             criteria[field_name] = answer
     return criteria

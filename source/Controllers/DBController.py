@@ -10,6 +10,15 @@ class DBController:
                a = 2
                # here you should do db writing
           return
+     
+     async def process_feedback(self,reply):
+          async with self.lock:
+               a = 2
+               # here you should do db writing
+          return
 
-     def get_link_info(self, url):
-          return "Here will be your link info. Url is: {}".format(url)
+     async def process_url_check(self,url,reply):
+          async with self.lock:
+               a = 2
+               # here you should do db writing
+          return

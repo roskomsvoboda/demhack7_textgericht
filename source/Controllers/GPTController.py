@@ -6,6 +6,9 @@ class GPTController:
 
     def __init__(self, api_key):
         openai.api_key = api_key
+    
+    def check_url(self, url, reply_lang="As text"):
+        pass
 
     def check_text(self, message, reply_lang="As text"):
         # Give context to the message

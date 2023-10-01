@@ -1,9 +1,12 @@
 import logging
-import traceback
 import os
-from telegram import ForceReply, Update, constants
-from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+import re
 import sys
+import traceback
+
+from telegram import Update, constants
+from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+
 sys.path.append("./Controllers")
 from DBController import DBController
 from GPTController import GPTController
@@ -38,8 +41,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 async def text_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Use this link to make bot typing
     await context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=constants.ChatAction.TYPING)
-
-    result = gptController.process_text(text=update.message.text)
+    parse_patterns = [re.compile(".*не обнаружен.*"), re.compile(".*отсутствует.*"), re.compile(".* нет .*")]
+    result = gptController.process_text(text=update.message.text, parse_patterns=parse_patterns)
     if isinstance(result, str):
         await update.message.reply_text(result)
         return

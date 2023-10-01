@@ -16,23 +16,23 @@
             <a href="/analyse_text" class="btn btn-primary">Analyze Text</a>
         </div>
     <div class="container mt-5">
-        <h1 class="mb-4">Texts</h1>
+        <h1 class="mb-4">Корпус</h1>
 
         <form method="post" action="{{ url_for('filter_texts') }}" class="mb-4">
             <div class="form-row">
                 <div class="col-md-4 mb-3">
-                    <label for="source">Filter by Source:</label>
+                    <label for="source">Фильтр по источнику:</label>
                     <input type="text" class="form-control" name="source" id="source">
                 </div>
 
                 <div class="col-md-4 mb-3">
-                    <label for="manipulation_method">Filter by Manipulation Method:</label>
+                    <label for="manipulation_method">Фильтр по приёмам манипуляции:</label>
                     <input type="text" class="form-control" name="manipulation_method" id="manipulation_method">
                 </div>
 
                 <div class="col-md-2 mb-3">
                     <label>&nbsp;</label>
-                    <button type="submit" class="btn btn-primary btn-block">Filter</button>
+                    <button type="submit" class="btn btn-primary btn-block">Отфильтровать</button>
                 </div>
             </div>
         </form>
@@ -40,7 +40,7 @@
         {% if source or manipulation_method %}
             <div class="alert alert-info" role="alert">
                 {% if source %}
-                    Source Filter: <strong>{{ source }}</strong>
+                    Фильтр по источнику: <strong>{{ source }}</strong>
                 {% endif %}
 
                 {% if source and manipulation_method %}
@@ -48,7 +48,7 @@
                 {% endif %}
 
                 {% if manipulation_method %}
-                    Manipulation Method Filter: <strong>{{ manipulation_method }}</strong>
+                    Фильтр по приему манипуляции: <strong>{{ manipulation_method }}</strong>
                 {% endif %}
             </div>
         {% endif %}
@@ -57,18 +57,18 @@
             <thead class="thead-dark">
                 <tr>
                     <th>ID</th>
-                    <th>Text</th>
-                    <th>Source</th>
-                    <th>Text Type</th>
-                    <th>Date</th>
-                    <th>Manipulation Methods</th>
+                    <th>Текст</th>
+                    <th>Источник</th>
+                    <th>Категория текста</th>
+                    <th>Дата</th>
+                    <th>Методы манипуляции</th>
                 </tr>
             </thead>
             <tbody>
                 {% for text in texts %}
                     <tr>
-                        <td>{{ text[0] }}</td>
-                        <td>{{ text[1] }}</td>
+                        <td><a href = '/texts/{{text[0]}}'>{{ text[0] }}</a></td>
+                        <td><div  class="expandable-text" style="max-height: 100px; overflow: hidden;"><p>{{ text[1] }}</p></div>{% if text[1]|length > 50 %}<button class="btn btn-link mt-2 read-more-btn" id="readMoreBtn">...</button>{% endif %}</td>
                         <td>{{ text[2] }}</td>
                         <td>{{ text[3] }}</td>
                         <td>{{ text[4] }}</td>
@@ -81,5 +81,20 @@
 
     <!-- Bootstrap JS and dependencies (optional, but needed for some features) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            // Click event for Read more buttons
+            $('.read-more-btn').click(function() {
+                var expandableText = $(this).prev('.expandable-text');
+                expandableText.toggleClass('expanded');
+
+                if (expandableText.hasClass('expanded')) {
+                    $(this).text('Read less');
+                } else {
+                    $(this).text('Read more');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

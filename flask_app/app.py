@@ -8,7 +8,7 @@ app.url_map.strict_slashes = False
 app.secret_key = os.urandom(12)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 WEBPAGE_PASSWORD = 'demhack7'
-DATABASE_PATH = './text_database.db'
+DATABASE_PATH = './sample_database.db'
 
 def dict_factory(cursor, row):
     d = {}
@@ -51,7 +51,7 @@ def get_texts(source=None, manipulation_method=None):
         conditions.append(f"t.source = '{source}'")
 
     if manipulation_method:
-        conditions.append(f"m.manipulation_method_name = '{manipulation_method}'")
+        conditions.append(f"m.manipulation_method_name LIKE '{manipulation_method}'")
 
     if conditions:
         query += ' WHERE ' + ' AND '.join(conditions)
@@ -112,8 +112,29 @@ def get_text_details(text_id):
 
     text_details = cursor.fetchone()
 
+    cursor.execute('''
+        SELECT * FROM text_2_manipulation_methods 
+        WHERE text_id = ?
+    ''', (text_details[0],))
+
+    # Fetch all the records
+    records = cursor.fetchall()
+    manip_ids = [r[1] for r in records]
+    manip_labels = []
+    for manip_id in manip_ids:
+        cursor.execute('''
+            SELECT * FROM manipulation_methods 
+            WHERE id = ?
+        ''', (manip_id,))
+
+        # Fetch all the records
+        records = cursor.fetchall()
+        manip_labels.extend([r[1] for r in records])
+    manip_labels = ', '.join(sorted(set(manip_labels)))
+    text_details = dict(text_details)
+    text_details['manipulation_methods'] = manip_labels
+
     conn.close()
-    print(text_details)
 
     return text_details
 

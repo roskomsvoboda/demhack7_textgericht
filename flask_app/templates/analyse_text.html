@@ -14,8 +14,8 @@
     <div class="container mt-3">
         <!-- Menu -->
         <div class="btn-group" role="group" aria-label="Menu">
-            <a href="/" class="btn btn-primary">Исследование корпуса</a>
-            <a href="/analyse_text" class="btn btn-active">Анализ текста</a>
+            <a href="/corpus" class="btn btn-light">Исследовать корпус</a>
+            <a href="/analyse_text" class="btn btn-primary">Анализировать текст</a>
         </div>
 
     <div class="container-fluid mt-5">
@@ -25,7 +25,7 @@
 
                 <form method="post" action="{{ url_for('analyse_text') }}" class="mt-4">
                     <div class="form-group">
-                        <label for="user_text">Enter Text:</label>
+                        <label for="user_text" class="mb-1">Введите текст:</label>
                         <textarea class="form-control" id="user_text" name="user_text" rows="5" required placeholder="Текст, который вы хотите проанализировать.">{{ request.form['user_text'] }}</textarea>
                     </div>
 

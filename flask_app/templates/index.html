@@ -12,8 +12,8 @@
     <div class="container mt-3">
         <!-- Menu -->
         <div class="btn-group" role="group" aria-label="Menu">
-            <a href="/" class="btn btn-active">Explore Corpus</a>
-            <a href="/analyse_text" class="btn btn-primary">Analyze Text</a>
+            <a href="/corpus" class="btn btn-primary">Исследовать корпус</a>
+            <a href="/analyse_text" class="btn btn-light">Анализировать текст</a>
         </div>
     <div class="container mt-5">
         <h1 class="mb-4">Корпус</h1>
@@ -72,7 +72,7 @@
                         <td>{{ text[2] }}</td>
                         <td>{{ text[3] }}</td>
                         <td>{{ text[4] }}</td>
-                        <td>{{ text[11] }}</td>
+                        <td>{{ text[-1] }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

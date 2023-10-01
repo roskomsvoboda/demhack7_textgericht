@@ -45,7 +45,7 @@ async def text_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         return
     # Store data about request
     await dbController.process_text_check(update.message.text, result)
-    await update.message.reply_text(result)
+    await update.message.reply_text(result['logical_fallacies'])
 
 async def link_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if len(context.args) == 0:

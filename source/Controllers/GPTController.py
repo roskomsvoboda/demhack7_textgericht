@@ -44,16 +44,16 @@ class GPTController:
             if f.endswith('_prompt.txt'):
                 with open(os.path.join(prompts_dir, f), 'r', encoding='utf-8') as f_in:
                     prompts[f.replace('.txt', '')] = '\n'.join(f_in.readlines())
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": f"{prompts['type_prompt']} '{text}'"}],
-            temperature=0,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0,
-        )
-        text_type = response["choices"][0]["message"]["content"]
-        if text_type.lower() != "личное сообщение":
+        # response = openai.ChatCompletion.create(
+        #     model="gpt-3.5-turbo",
+        #     messages=[{"role": "user", "content": f"{prompts['type_prompt']} '{text}'"}],
+        #     temperature=0,
+        #     top_p=1,
+        #     frequency_penalty=0,
+        #     presence_penalty=0,
+        # )
+        # text_type = response["choices"][0]["message"]["content"]
+        if len(text) > 100:
             return analyze_text(text, prompts)
         else:
             return ("Этот текст похож на личное сообщение и не будет проверен на наличие манипуляций, "

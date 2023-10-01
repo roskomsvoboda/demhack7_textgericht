@@ -1,13 +1,20 @@
 import sqlite3
 import openai
 from get_chatgpt_criteria import *
-from flask import Flask, render_template, request, session, url_for, redirect
+from flask import Flask, render_template, request, session, url_for, redirect, abort
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 app.secret_key = os.urandom(12)
 openai.api_key = os.getenv("OPENAI_API_KEY")
-WEBPAGE_PASSWORD = 'a'
+WEBPAGE_PASSWORD = 'demhack7'
+DATABASE_PATH = './text_database.db'
+
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -28,7 +35,7 @@ def not_found(e):
   return render_template("404.html")
 
 def get_texts(source=None, manipulation_method=None):
-    conn = sqlite3.connect('./text_database.db')
+    conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
 
     query = '''
@@ -92,6 +99,32 @@ def analyse_text():
 
     return render_template('analyse_text.html', analysis_result=analysis_result)
 
+def get_text_details(text_id):
+    conn = sqlite3.connect(DATABASE_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
 
+    # Query to retrieve text details by ID
+    cursor.execute('''
+        SELECT * FROM texts
+        WHERE id = ?
+    ''', (text_id,))
+
+    text_details = cursor.fetchone()
+
+    conn.close()
+    print(text_details)
+
+    return text_details
+
+@app.route('/texts/<int:text_id>')
+def text_details(text_id):
+    text_details = get_text_details(text_id)
+
+    if text_details:
+        return render_template('text_details.html', text_details=text_details)
+    else:
+        abort(404)
+        
 if __name__ == '__main__':
     app.run(debug=True)

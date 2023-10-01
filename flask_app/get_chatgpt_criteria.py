@@ -15,7 +15,8 @@ def process_text(text):
     run_analysis = False
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": f"{PROMPTS['type_prompt']} '{text}'"}]
+        messages=[{"role": "user", "content": f"{PROMPTS['type_prompt']} '{text}'"}],
+        temperature=0
     )
     text_type = response["choices"][0]["message"]["content"]
     if text_type.lower() != "личное сообщение":
@@ -39,7 +40,8 @@ def analyse_text(text, text_type):
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "user", "content": f"{prompt} '{text}'"},
-            ]
+            ],
+            temperature=0
         )
         answer = response["choices"][0]["message"]["content"]
         criteria[field_name] = answer

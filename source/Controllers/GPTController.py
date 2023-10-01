@@ -38,7 +38,7 @@ def analyze_text(text: str, prompts: dict):
 class GPTController:
     def __init__(self, api_key):
         openai.api_key = api_key
-    def process_text(text: str, prompts_dir='../prompts'):
+    def process_text(text: str, prompts_dir: str):
         prompts = {}
         for f in os.listdir(prompts_dir):
             if f.endswith('_prompt.txt'):

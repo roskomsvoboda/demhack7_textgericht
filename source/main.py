@@ -39,7 +39,7 @@ async def text_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     # Use this link to make bot typing
     await context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=constants.ChatAction.TYPING)
 
-    result = gptController.process_text(update.message.text)
+    result = gptController.process_text(text=update.message.text, prompts_dir='../prompts/')
     # Store data about request
     await dbController.process_text_check(update.message.text, result)
     await update.message.reply_text(result)

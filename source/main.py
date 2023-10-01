@@ -48,7 +48,18 @@ async def text_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         return
     # Store data about request
     await dbController.process_text_check(update.message.text, result)
-    await update.message.reply_text(result['logical_fallacies'])
+    hr_answer = result
+    for field_name, prompt in result.items():
+        if not bool(re.match(r'.*_present', field_name)):
+            hr_text = result[field_name].split('\n\n')
+            target_text = list()
+            for idx, ans_el in enumerate(hr_text):
+                if sum(bool(pattern.match(ans_el)) for pattern in parse_patterns):
+                    target_text = target_text.append(re.sub(r'\..*', '.', ans_el))
+            if target_text:
+                hr_answer[field_name] = '\n'.join(target_text)
+    hr_ans = '\n'.join([hr_answer[k] for k in hr_answer.keys() if not re.match(r'.*_present', k)])
+    await update.message.reply_text(hr_ans)
 
 async def link_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if len(context.args) == 0:

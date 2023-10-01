@@ -51,6 +51,5 @@ class GPTController:
         if len(text) > 100:
             return analyze_text(text, prompts, parse_patterns,reply_lang)
         else:
-            return ("Этот текст похож на личное сообщение и не будет проверен на наличие манипуляций, "
-                    "логических ошибок или hatespeech.")
+            return "Этот текст похож на личное сообщение и не будет проверен на наличие манипуляций логических ошибок или hatespeech."
         

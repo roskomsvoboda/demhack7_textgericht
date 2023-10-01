@@ -56,15 +56,15 @@ async def text_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     hr_answer = result
     for field_name, prompt in result.items():
         if not bool(re.match(r'.*_present', field_name)):
-            hr_text = result[field_name].split('\n\n')
+            hr_text = ''.join(result[field_name]).split('\n\n')
             target_text = list()
             for idx, ans_el in enumerate(hr_text):
                 if sum(bool(pattern.match(ans_el)) for pattern in parse_patterns):
                     target_text = target_text.append(re.sub(r'\..*', '.', ans_el))
             if target_text:
                 hr_answer[field_name] = '\n'.join(target_text)
-    hr_ans = '\n'.join([hr_answer[k] for k in hr_answer.keys() if not re.match(r'.*_present', k)])
-    await update.message.reply_text(hr_ans)
+    [await update.message.reply_text(''.join(hr_answer[k]).encode('utf-8').decode('utf-8')) for k in hr_answer.keys() if not re.match(r'.*_present', k)]
+    
     # You can put info of any text instead of 'metainfo' word, this is to understand for which text feedback is
     feedback_options=[
         InlineKeyboardButton("Good", callback_data="metainfo;answer:1"), 

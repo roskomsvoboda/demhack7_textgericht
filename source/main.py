@@ -1,10 +1,14 @@
 import logging
-import traceback
 import os
 import re
 from telegram import ForceReply, Update, constants, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackQueryHandler
 import sys
+import traceback
+
+from telegram import Update, constants
+from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+
 sys.path.append("./Controllers")
 from DBController import DBController
 from GPTController import GPTController
@@ -40,12 +44,27 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 async def text_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Use this link to make bot typing
     await context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=constants.ChatAction.TYPING)
-
-    result = gptController.check_text(update.message.text, context.chat_data["lang"] if "lang" in context.chat_data.keys() else "As text")
+    
+    parse_patterns = [re.compile(".*не обнаружен.*"), re.compile(".*отсутствует.*"), re.compile(".* нет .*")]
+    result = gptController.process_text(text=update.message.text, parse_patterns=parse_patterns,
+        reply_lang=context.chat_data["lang"] if "lang" in context.chat_data.keys() else "As text")
+    if isinstance(result, str):
+        await update.message.reply_text(result)
+        return
     # Store data about request
     await dbController.process_text_check(update.message.text, result)
-
-    await update.message.reply_text(result)
+    hr_answer = result
+    for field_name, prompt in result.items():
+        if not bool(re.match(r'.*_present', field_name)):
+            hr_text = result[field_name].split('\n\n')
+            target_text = list()
+            for idx, ans_el in enumerate(hr_text):
+                if sum(bool(pattern.match(ans_el)) for pattern in parse_patterns):
+                    target_text = target_text.append(re.sub(r'\..*', '.', ans_el))
+            if target_text:
+                hr_answer[field_name] = '\n'.join(target_text)
+    hr_ans = '\n'.join([hr_answer[k] for k in hr_answer.keys() if not re.match(r'.*_present', k)])
+    await update.message.reply_text(hr_ans)
     # You can put info of any text instead of 'metainfo' word, this is to understand for which text feedback is
     feedback_options=[
         InlineKeyboardButton("Good", callback_data="metainfo;answer:1"), 

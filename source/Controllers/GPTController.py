@@ -5,12 +5,12 @@ import openai
 
 def analyze_text(text: str, prompts: dict, parse_patterns: list, reply_lang):
     field2prompt = {
-        "manipulation_methods": prompts['manipulation_prompt'],
-        "hatespeech": prompts['hatespeech_prompt'],
-        "references": prompts['references_prompt'],
+        #"manipulation_methods": prompts['manipulation_prompt'],
+        #"hatespeech": prompts['hatespeech_prompt'],
+        #"references": prompts['references_prompt'],
         "logical_fallacies": prompts['logical_fallacy_prompt'],
-        "references_present": 0,
-        "manipulation_present": 0,
+        #"references_present": 0,
+        #"manipulation_present": 0,
         "logical_fallacies_present": 0
     }
     criteria = {field: None for field in field2prompt.keys()}
@@ -45,7 +45,7 @@ class GPTController:
     def process_text(self, text: str, parse_patterns: list, prompts_dir='./prompts/', reply_lang="As text"):
         prompts = {}
         for f in os.listdir(prompts_dir):
-            if f.endswith('_prompt.txt'):
+            if f.endswith('_fallacy_prompt.txt'):
                 with open(os.path.join(prompts_dir, f), 'r', encoding='utf-8') as f_in:
                     prompts[f.replace('.txt', '')] = '\n'.join(f_in.readlines())
         if len(text) > 100:

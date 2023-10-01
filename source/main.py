@@ -63,7 +63,7 @@ async def text_check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
                     target_text = target_text.append(re.sub(r'\..*', '.', ans_el))
             if target_text:
                 hr_answer[field_name] = '\n'.join(target_text)
-    [await update.message.reply_text(''.join(hr_answer[k]).encode('utf-8').decode('utf-8')) for k in hr_answer.keys() if not re.match(r'.*_present', k)]
+    [await update.message.reply_text('\n'.join(hr_answer[k]).encode('utf-8').decode('utf-8')) for k in hr_answer.keys() if not re.match(r'.*_present', k)]
     
     # You can put info of any text instead of 'metainfo' word, this is to understand for which text feedback is
     feedback_options=[

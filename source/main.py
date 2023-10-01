@@ -61,14 +61,6 @@ async def link_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if len(context.args) == 0:
         await update.message.reply_text("No URL were provided. Aborting")
         return
-    if len(context.args) > 1:
-        await update.message.reply_text("The given text contains other words besides URL. I will process the whole text...")
-        await text_check(update,context)
-        return
-    url_pattern = "^[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"
-    if re.match(url_pattern, context.args[0]) is None:
-        await update.message.reply_text("URL is not valid")
-        return
     
     await context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=constants.ChatAction.TYPING)
 
@@ -117,13 +109,12 @@ def main() -> None:
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
-    application.add_handler(CommandHandler("link_info", link_info))
+    application.add_handler(CommandHandler("link_info", link_info, filters=(filters.Entity("url") | filters.Entity("text_link"))))
     application.add_handler(CommandHandler("set_lang", set_lang))
     application.add_error_handler(error)
     application.add_handler(CallbackQueryHandler(feedback_button))
 
-    application.add_handler(MessageHandler(filters.ChatType.PRIVATE & filters.TEXT & (filters.Entity("url") | filters.Entity("text_link")), link_info))
-    application.add_handler(MessageHandler(filters.ChatType.PRIVATE & filters.TEXT & ~filters.COMMAND & ~(filters.Entity("url") | filters.Entity("text_link")), text_check))
+    application.add_handler(MessageHandler(filters.ChatType.PRIVATE & filters.TEXT & ~filters.COMMAND, text_check))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 

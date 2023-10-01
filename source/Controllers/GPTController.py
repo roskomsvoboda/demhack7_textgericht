@@ -8,7 +8,7 @@ class GPTController:
         openai.api_key = api_key
     
     def check_url(self, url, reply_lang="As text"):
-        pass
+        return "Nothing to say for now"
 
     def check_text(self, message, reply_lang="As text"):
         # Give context to the message

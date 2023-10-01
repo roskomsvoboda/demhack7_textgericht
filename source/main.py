@@ -128,7 +128,7 @@ def main() -> None:
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
-    application.add_handler(CommandHandler("link_info", link_info, filters=(filters.Entity("url") | filters.Entity("text_link"))))
+    application.add_handler(CommandHandler("link_info", link_info))
     application.add_handler(CommandHandler("set_lang", set_lang))
     application.add_error_handler(error)
     application.add_handler(CallbackQueryHandler(feedback_button))

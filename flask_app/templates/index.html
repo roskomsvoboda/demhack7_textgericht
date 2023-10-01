@@ -68,11 +68,11 @@
                 {% for text in texts %}
                     <tr>
                         <td><a href = '/texts/{{text[0]}}'>{{ text[0] }}</a></td>
-                        <td><div  class="expandable-text" style="max-height: 100px; overflow: hidden;"><p>{{ text[1] }}</p></div>{% if text[1]|length > 50 %}<button class="btn btn-link mt-2 read-more-btn" id="readMoreBtn">...</button>{% endif %}</td>
+                        <td><div  class="expandable-text" style="max-height: 100px; overflow: hidden;"><p>{{ text[1] }}</p></div>{% if text[1]|length > 350 %}<button class="btn btn-link mt-2 read-more-btn" id="readMoreBtn">...</button>{% endif %}</td>
                         <td>{{ text[2] }}</td>
                         <td>{{ text[3] }}</td>
                         <td>{{ text[4] }}</td>
-                        <td>{{ text[-1] }}</td>
+                        <td>{% if text[-1] %} {{ text[-1] }} {% endif %}</td>
                     </tr>
                 {% endfor %}
             </tbody>

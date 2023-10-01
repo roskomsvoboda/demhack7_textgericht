@@ -120,6 +120,7 @@ def get_text_details(text_id):
     # Fetch all the records
     records = cursor.fetchall()
     manip_ids = [r[1] for r in records]
+    manip_fragments = [r[2] for r in records]
     manip_labels = []
     for manip_id in manip_ids:
         cursor.execute('''
@@ -130,10 +131,10 @@ def get_text_details(text_id):
         # Fetch all the records
         records = cursor.fetchall()
         manip_labels.extend([r[1] for r in records])
-    manip_labels = ', '.join(sorted(set(manip_labels)))
     text_details = dict(text_details)
     text_details['manipulation_methods'] = manip_labels
-
+    text_details['manipulation_fragments'] = manip_fragments
+    print(text_details)
     conn.close()
 
     return text_details

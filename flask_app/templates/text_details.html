@@ -29,11 +29,20 @@
                         <p class="card-text"><strong>Source:</strong> {{ text_details.source }}</p>
                     </div>
                 </div>
+                
+        <div class = 'row mt-2'><div class = 'col'><h4>Текст</h4></div></div>
+        <div class="row mt-2">
+            <div class = "col">
+                {{text_details['text']}}
+            </div>
+            </div>
                 </div>
                 <div class = "col-md-6">
-                    <div class="mt-4">
+                    <div>
                         <h5>Приёмы манипуляции читателем</h5>
-                        <p style="white-space: pre-wrap;">{{ text_details['manipulation_methods'] }}</p>
+                        {% for m in text_details['manipulation_methods'] %}
+                        <p style="white-space: pre-wrap;"><b>{{m}}</b>: {{text_details['manipulation_fragments'][loop.index0]}}</p>
+                        {% endfor %}
                         <h5>Логические ошибки</h5>
                         <p style="white-space: pre-wrap;">{{ text_details['logical_fallacies'] }}</p>
                         <h5>Язык ненависти</h5>
@@ -47,12 +56,7 @@
             </div>
 
         </div>
-        
-        <div class="row">
-            <div class = "col">
-                {{text_details['text']}}
-            </div>
-            </div>
+        <hr/>
     </div>
 </div>
 
